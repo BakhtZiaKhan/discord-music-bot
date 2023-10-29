@@ -14,28 +14,31 @@ if not os.path.exists(DOWNLOADS_FOLDER):
 
 load_dotenv()
 # Get the API token from the .env file.
-DISCORD_TOKEN = os.getenv("MTE2NTMwMDg0NTIxOTQyNjM3NA.GxGV61.iUG9lAp9q5RaFDukF9FUxOS4PH2J4ngEgS-PIc")
+DISCORD_TOKEN = os.getenv("--Discord Token--")
 
 intents = discord.Intents().all()
 client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix='!',intents=intents)
 
 
+# Disable bug reports message from youtube_dl.utils
 youtube_dl.utils.bug_reports_message = lambda: ''
 
+# Configuration options for youtube-dl
 ytdl_format_options = {
-    'format': 'bestaudio/best',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0',
+    'format': 'bestaudio/best',          # Choose the best audio quality and format
+    'restrictfilenames': True,           # Ensure safe filenames without special characters
+    'noplaylist': True,                  # Download only single tracks, not playlists
+    'nocheckcertificate': True,          # Disable SSL certificate checks
+    'ignoreerrors': False,              # Do not ignore download errors, report them
+    'logtostderr': False,               # Do not log to standard error output
+    'quiet': True,                      # Keep the download process quiet, suppress additional information
+    'no_warnings': True,                # Suppress warnings during the download process
+    'default_search': 'auto',           # Automatically choose the appropriate search source
+    'source_address': '0.0.0.0',       # Set the source IP address to 0.0.0.0
     'extractor': 'soundcloud,youtube',  # Add 'soundcloud' and 'youtube' as extractors
 }
+
 
 
 ffmpeg_options = {
@@ -80,7 +83,7 @@ async def play(ctx, url):
             else:
                 ytdl_format_options['extractor'] = 'youtube'
             filename = await YTDLSource.from_url(url, loop=bot.loop)
-            voice_channel.play(discord.FFmpegPCMAudio(executable="C:\\Users\\bakht\\Documents\\discord-music-bot\\ffmpeg\\bin\\ffmpeg.exe", source=filename))
+            voice_channel.play(discord.FFmpegPCMAudio(executable="--Path to FFmpeg folder--", source=filename))
             last_downloaded_file = filename  # Set the last downloaded file
             await ctx.send(f'**Now playing:** {filename}')
         except youtube_dl.utils.DownloadError as e:
@@ -99,7 +102,7 @@ async def stop(ctx):
         if last_downloaded_file:
             try:
                 # Move the last downloaded file into the downloads folder
-                os.replace(last_downloaded_file, os.path.join("C:\\Users\\bakht\\Documents\\discord-music-bot\\downloads", os.path.basename(last_downloaded_file)))
+                os.replace(last_downloaded_file, os.path.join("--Path to projects download folder--", os.path.basename(last_downloaded_file)))
                 await ctx.send(f'The song has been moved to the downloads folder.')
                 last_downloaded_file = None  # Clear the last downloaded file variable
             except Exception as e:
@@ -122,35 +125,51 @@ async def join(ctx):
     await channel.connect()
 
 
+
 @bot.command(name='pause', help='This command pauses the song')
 async def pause(ctx):
+    # Get the voice client of the bot in the current server
     voice_client = ctx.message.guild.voice_client
 
     if voice_client is None:
+        # If the bot is not connected to a voice channel, inform the user
         await ctx.send("The bot is not connected to a voice channel.")
     elif voice_client.is_playing():
+        # If the bot is currently playing audio, pause the playback
         voice_client.pause()
     else:
-        await ctx.send("Whatta I do ?")
+        # If the bot is not playing audio (already paused or stopped), inform the user
+        await ctx.send("Audio is already paused or stopped so cant be paused")
+
 
     
 @bot.command(name='resume', help='Resumes the song')
 async def resume(ctx):
+    # Get the voice client of the bot in the current server
     voice_client = ctx.message.guild.voice_client
+
     if voice_client.is_paused():
+        # If the bot is currently paused, resume the playback
         await voice_client.resume()
     else:
-        await ctx.send("Calm")
+        # If the bot is not paused or there's no audio to resume, respond with "Calm"
+        await ctx.send("Audio is not paused or theres no audio to resume ")
+
     
 
 
 @bot.command(name='leave', help='To make the bot leave the voice channel')
 async def leave(ctx):
+    # Get the voice client of the bot in the current server
     voice_client = ctx.message.guild.voice_client
+
     if voice_client.is_connected():
+        # If the bot is currently connected to a voice channel, disconnect from it
         await voice_client.disconnect()
     else:
-        await ctx.send("Man I aint even wanna be with u lames ")
+        # If the bot is not connected or wasn't in a voice channel, respond with a playful message
+        await ctx.send("Im not in a VC yet!!")
+
 
 @bot.command(name='clear', help='Clears the downloaded files folder')
 async def clear(ctx):
@@ -174,16 +193,7 @@ async def clear(ctx):
 #Make skip button and make que system
 
 
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__" :
-    bot.run("MTE2NTMwMDg0NTIxOTQyNjM3NA.GxGV61.iUG9lAp9q5RaFDukF9FUxOS4PH2J4ngEgS-PIc")
+    bot.run("--Discord Token--")
 
 
